@@ -1,47 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import useWebSocket, { ReadyState } from "react-use-websocket";
 
 const WebSocketChat = () => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
-  const ws = useRef(null);
+  const { sendMessage, lastMessage, readyState } = useWebSocket("ws://localhost:8080/ws");
 
   useEffect(() => {
-    ws.current = new WebSocket("ws://localhost:8080/ws");
-
-    ws.current.onopen = () => {
-      console.log("WebSocket connection opened");
-      ws.current.send("Hello, my friends!");
-    };
-
-    ws.current.onclose = (event) => {
-      if (event.wasClean) {
-        console.log(`Connection closed cleanly, code=${event.code}, reason=${event.reason}`);
-      } else {
-        console.error("Connection died");
-      }
-      console.log("WebSocket connection closed");
-      addMessage("WebSocket connection closed");
-    };
-
-    ws.current.onerror = (error) => {
-      console.error("WebSocket error", error);
-      addMessage("An error occurred");
-    };
-
-    ws.current.onmessage = (event) => {
-      console.log("Received message", event);
-      addMessage(event.data);
-    };
-
-    return () => {
-      ws.current.close();
-    };
-  }, []);
-
-  const addMessage = (message) => {
-    setMessages((prevMessages) => [...prevMessages, message]);
-  };
+    if (lastMessage !== null) {
+      setMessages((prevMessages) => [...prevMessages, lastMessage.data]);
+    }
+  }, [lastMessage]);
 
   const handleSendMessage = async () => {
     if (message) {
@@ -50,10 +20,18 @@ const WebSocketChat = () => {
         setMessage("");
       } catch (error) {
         console.error("Error sending message to channel", error);
-        addMessage("Failed to send message");
+        setMessages((prevMessages) => [...prevMessages, "Failed to send message"]);
       }
     }
   };
+
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: "Connecting",
+    [ReadyState.OPEN]: "Open",
+    [ReadyState.CLOSING]: "Closing",
+    [ReadyState.CLOSED]: "Closed",
+    [ReadyState.UNINSTANTIATED]: "Uninstantiated",
+  }[readyState];
 
   return (
     <div>
@@ -70,6 +48,7 @@ const WebSocketChat = () => {
         onChange={(e) => setMessage(e.target.value)}
       />
       <button id="sendButton" onClick={handleSendMessage}>Send</button>
+      <p>The WebSocket is currently {connectionStatus}</p>
     </div>
   );
 };
