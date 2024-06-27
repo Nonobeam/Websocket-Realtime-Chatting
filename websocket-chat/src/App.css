@@ -1,0 +1,20 @@
+.App {
+  text-align: center;
+}
+
+#messages {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+  height: 300px;
+  overflow-y: scroll;
+}
+
+#messageInput {
+  width: 80%;
+  padding: 10px;
+}
+
+#sendButton {
+  padding: 10px;
+}

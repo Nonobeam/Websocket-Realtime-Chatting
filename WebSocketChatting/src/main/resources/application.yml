@@ -1,0 +1,18 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://Nonobeam:Haha123456!@cluster0.aqdwohh.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      database: Cluster0
+    redis:
+      url: jdbc:redis://redis-16514.c259.us-central1-2.gce.redns.redis-cloud.com:16514
+  security:
+    oauth2:
+      client:
+        clientId:
+        clientSecret:
+  main:
+    web-application-type: reactive
+
+
+
+
